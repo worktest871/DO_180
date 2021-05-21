@@ -2,15 +2,15 @@
   "kind": "Template",
   "apiVersion": "v1",
   "metadata": {
-    "name": "todonodejs-persistent",
+    "name": "etherpad-persistent",
     "annotations": {
-      "openshift.io/display-name": "TODO Application NodeJS 4.0 and MySQL 5.7"
+      "openshift.io/display-name": "Etherpad and mysql (dockerhub)"
     }
   },
   "message": "",
   "labels": {
-    "template": "todonodejs-mysql-persistent-template",
-    "app": "todonodejs"
+    "template": "etherpad-mysql-persistent-template",
+    "app": "etherpad"
   },
   "objects": [
     {
@@ -25,24 +25,24 @@
       "spec": {
         "containers": [
           {
-            "image": "quay.io/${RHT_OCP4_QUAY_USER}/do180-mysql-57-rhel7",
+            "image": "harbor.prod.paas.pop.noris.de/dockerhub/library/mysql",
             "name": "mysql",
             "env": [
               {
                 "name": "MYSQL_ROOT_PASSWORD",
-                "value": "r00tpa55"
+                "value": "testpw"
               },
               {
                 "name": "MYSQL_USER",
-                "value": "user1"
+                "value": "etherpad"
               },
               {
                 "name": "MYSQL_PASSWORD",
-                "value": "mypa55"
+                "value": "etherpad"
               },
               {
                 "name": "MYSQL_DATABASE",
-                "value": "items"
+                "value": "etherpad"
               }
             ],
             "ports": [
@@ -83,9 +83,9 @@
       "apiVersion": "v1",
       "kind": "Pod",
       "metadata": {
-        "name": "todoapi",
+        "name": "etherpad",
         "labels": {
-          "name": "todoapi"
+          "name": "etherpad"
         }
       },
       "spec": {
@@ -96,26 +96,26 @@
                 "cpu": "0.5"
               }
             },
-            "image": "quay.io/${RHT_OCP4_QUAY_USER}/do180-todonodejs",
-            "name": "todoapi",
+            "image": "harbor.prod.paas.pop.noris.de/dockerhub/etherpad/etherpad",
+            "name": "etherpad",
             "ports": [
               {
-                "containerPort": 30080,
-                "name": "nodejs-http"
+                "containerPort": 9001,
+                "name": "etherpad-http"
               }
             ],
             "env": [
               {
                 "name": "MYSQL_ENV_MYSQL_DATABASE",
-                "value": "items"
+                "value": "etherpad"
               },
               {
                 "name": "MYSQL_ENV_MYSQL_USER",
-                "value": "user1"
+                "value": "etherpad"
               },
               {
                 "name": "MYSQL_ENV_MYSQL_PASSWORD",
-                "value": "mypa55"
+                "value": "etherpad"
               }
             ]
           }
@@ -127,18 +127,18 @@
       "kind": "Service",
       "metadata": {
         "labels": {
-          "name": "todoapi"
+          "name": "etherpad"
         },
-        "name": "todoapi"
+        "name": "etherpad"
       },
       "spec": {
         "ports": [
           {
-            "port": 30080
+            "port": 9001
           }
         ],
         "selector": {
-          "name": "todoapi"
+          "name": "etherpad"
         }
       }
     },
@@ -174,7 +174,7 @@
         ],
         "resources": {
           "requests": {
-            "storage": "1Mi"
+            "storage": "500Mi"
           }
         }
       }
@@ -191,7 +191,7 @@
         ],
         "resources": {
           "requests": {
-            "storage": "10Mi"
+            "storage": "800Mi"
           }
         }
       }
@@ -200,7 +200,7 @@
   "parameters": [
     {
       "description": "Quay namespace the images are stored in",
-      "name": "RHT_OCP4_QUAY_USER",
+      "name": "sprechtl",
       "required": true
     }
   ]
